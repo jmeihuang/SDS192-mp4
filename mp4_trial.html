@@ -211,107 +211,22 @@ library(tidyverse)</code></pre>
                 password = &quot;RememberPi&quot;, 
                 dbname = &quot;imdb&quot;)
 knitr::opts_chunk$set(connection = db, max.print = 20)</code></pre>
-<pre class="sql"><code>SELECT ci.movie_id, t.production_year
+<pre class="r"><code>##filtering the movie_id that Weinstein produced ----
+movie_id &lt;- dbGetQuery(db, 'SELECT ci.movie_id, t.production_year
 FROM imdb.cast_info ci
 join name n on n.id = ci.person_id
 join title t on t.id = ci.movie_id
 join role_type r on r.id = ci.role_id
 where n.id = 2551650
 and r.id = 3
-order by production_year desc;</code></pre>
-<div class="knitsql-table">
-<table>
-<caption>Displaying records 1 - 20</caption>
-<thead>
-<tr class="header">
-<th align="right">movie_id</th>
-<th align="right">production_year</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">4511046</td>
-<td align="right">2019</td>
-</tr>
-<tr class="even">
-<td align="right">3587531</td>
-<td align="right">2018</td>
-</tr>
-<tr class="odd">
-<td align="right">3587531</td>
-<td align="right">2018</td>
-</tr>
-<tr class="even">
-<td align="right">2978855</td>
-<td align="right">2017</td>
-</tr>
-<tr class="odd">
-<td align="right">2978856</td>
-<td align="right">2017</td>
-</tr>
-<tr class="even">
-<td align="right">2978857</td>
-<td align="right">2017</td>
-</tr>
-<tr class="odd">
-<td align="right">2978858</td>
-<td align="right">2017</td>
-</tr>
-<tr class="even">
-<td align="right">2978859</td>
-<td align="right">2017</td>
-</tr>
-<tr class="odd">
-<td align="right">410594</td>
-<td align="right">2017</td>
-</tr>
-<tr class="even">
-<td align="right">2978860</td>
-<td align="right">2017</td>
-</tr>
-<tr class="odd">
-<td align="right">3278371</td>
-<td align="right">2017</td>
-</tr>
-<tr class="even">
-<td align="right">4098854</td>
-<td align="right">2017</td>
-</tr>
-<tr class="odd">
-<td align="right">4438869</td>
-<td align="right">2017</td>
-</tr>
-<tr class="even">
-<td align="right">2307499</td>
-<td align="right">2017</td>
-</tr>
-<tr class="odd">
-<td align="right">2307500</td>
-<td align="right">2017</td>
-</tr>
-<tr class="even">
-<td align="right">3214944</td>
-<td align="right">2017</td>
-</tr>
-<tr class="odd">
-<td align="right">2307501</td>
-<td align="right">2017</td>
-</tr>
-<tr class="even">
-<td align="right">2307502</td>
-<td align="right">2017</td>
-</tr>
-<tr class="odd">
-<td align="right">4564169</td>
-<td align="right">2017</td>
-</tr>
-<tr class="even">
-<td align="right">2307503</td>
-<td align="right">2017</td>
-</tr>
-</tbody>
-</table>
-</div>
+order by production_year desc;')</code></pre>
+<pre class="r"><code>new &lt;- dbGetQuery(db, 'SELECT distinct(ci.movie_id), t.title, t.production_year
+FROM imdb.cast_info ci
+join name n on n.id = ci.person_id
+join title t on t.id = ci.movie_id
+join role_type r on r.id = ci.role_id
+where n.gender = \'f\'
+and r.id = 3;')</code></pre>
 
 
 
