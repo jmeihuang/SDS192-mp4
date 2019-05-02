@@ -1,0 +1,39 @@
+---
+title: "joyce"
+output: html_document
+---
+```{r, echo = FALSE, message=FALSE}
+##loading the packages and pulling out the imdb dataset
+library(tidyverse)
+library(RMySQL)
+db <- dbConnect(MySQL(), 
+                host = "scidb.smith.edu", 
+                user = "mth292", 
+                password = "RememberPi", 
+                dbname = "imdb")
+knitr::opts_chunk$set(connection = db, max.print = 20)
+```
+
+```{r}
+women <- dbGetQuery(db,
+                    'select ci.movie_id, info as genre,
+                    name, production_year
+                    from cast_info ci
+                    join movie_info m on m.movie_id = ci.movie_id
+                    join name n on n.id = ci.person_id
+                    join role_type r on r.id = ci.role_id
+                    join title t on t.id = ci.movie_id
+                    where r.id = 3
+                    and n.gender like "f"
+                    and m.info_type_id = 3
+                    and t.production_year > 2010
+                    limit 0,5')
+```
+
+```{r}
+new <- women %>%
+  group_by(genre) %>%
+  summarize(n())
+```
+
+

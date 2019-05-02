@@ -1,11 +1,13 @@
 ---
 title: "mp4_trial"
-output: 
+output:
   html_document:
-    code folding: "hide"
+    theme: sandstone
+    df_print: paged
+    code_folding: "hide"
 ---
 
-```{r}
+```{r, echo = FALSE, message=FALSE}
 ##loading the packages and pulling out the imdb dataset
 library(tidyverse)
 library(RMySQL)
@@ -28,6 +30,23 @@ where n.id = 2551650
 and r.id = 3
 order by production_year desc;')
 ```
+
+```{r}
+new <- dbGetQuery(db, 'SELECT count(ci.movie_id), m.info
+FROM imdb.cast_info ci
+join name n on n.id = ci.person_id
+join title t on t.id = ci.movie_id 
+join role_type r on r.id = ci.role_id
+join movie_info m on m.movie_id = ci.movie_id
+where n.gender like \'f\'
+and m.info_type_id =3
+and r.id = 8
+and t.production_year >1999
+group by m.info
+limit 0, 5;')
+```
+
+
 
 
 ```{r}
