@@ -1,0 +1,46 @@
+---
+title: "mp4_trial"
+output:
+  html_document:
+    theme: sandstone
+    df_print: paged
+    code_folding: "hide"
+---
+
+```{r, echo = FALSE, message=FALSE}
+##loading the packages and pulling out the imdb dataset
+library(tidyverse)
+library(RMySQL)
+db <- dbConnect(MySQL(), 
+                host = "scidb.smith.edu", 
+                user = "mth292", 
+                password = "RememberPi", 
+                dbname = "imdb")
+knitr::opts_chunk$set(connection = db, max.print = 20)
+```
+
+```{r}
+##filtering the movie_id that Weinstein produced ----
+movie_id <- dbGetQuery(db, 'SELECT ci.movie_id, t.production_year
+FROM imdb.cast_info ci
+join name n on n.id = ci.person_id
+join title t on t.id = ci.movie_id
+join role_type r on r.id = ci.role_id
+where n.id = 2551650
+and r.id = 3
+order by production_year desc;')
+```
+
+```{r}
+new <- dbGetQuery(db, 'SELECT distinct(ci.movie_id), t.title, t.production_year
+FROM imdb.cast_info ci
+join name n on n.id = ci.person_id
+join title t on t.id = ci.movie_id
+join role_type r on r.id = ci.role_id
+where n.gender = \'f\'
+and r.id = 3;')
+new
+```
+
+
+
