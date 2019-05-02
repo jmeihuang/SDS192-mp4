@@ -188,18 +188,22 @@ $(document).ready(function () {
 </div>
 
 
-<pre class="r"><code>women &lt;- dbGetQuery(db,
-                    'select ci.movie_id, info,
-                    name, production_year
-                    from cast_info ci
-                    join movie_info m on m.movie_id = ci.movie_id
-                    join name n on n.id = ci.person_id
-                    join role_type r on r.id = ci.role_id
-                    join title t on t.id = ci.movie_id
-                    where r.id = 3
-                    and n.gender like &quot;f&quot;
-                    and m.info_type_id = 3
-                    limit 0,20;')</code></pre>
+<pre class="r"><code>test &lt;- dbGetQuery (db,
+                    'select count(ci.movie_id) as total, info, name, production_year
+from cast_info ci
+join movie_info m on m.movie_id = ci.movie_id ##join to filter by person_role_id
+join name n on n.id = ci.person_id ##join to filter by gender
+join role_type r on r.id = ci.role_id
+join title t on t.id = ci.movie_id
+where r.id = 3
+and n.gender like &quot;f&quot;
+and m.info_type_id = 3
+and t.production_year &gt; 2010
+group by m.info
+order by total desc
+limit 0,5;')</code></pre>
+<pre class="r"><code>hmm &lt;- ggplot(test, aes(x = genre, y = total)) +
+  geom_bar()</code></pre>
 
 
 
