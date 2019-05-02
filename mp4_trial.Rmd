@@ -32,7 +32,7 @@ order by production_year desc;')
 ```
 
 ```{r}
-new <- dbGetQuery(db, 'SELECT count(distinct ci.movie_id) 
+new <- dbGetQuery(db, 'SELECT count(ci.movie_id), m.info
 FROM imdb.cast_info ci
 join name n on n.id = ci.person_id
 join title t on t.id = ci.movie_id 
