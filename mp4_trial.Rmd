@@ -31,21 +31,29 @@ and r.id = 3
 order by production_year desc;')
 ```
 
+##Top male dominated genres
 ```{r}
-new <- dbGetQuery(db, 'SELECT count(ci.movie_id), m.info
+test <- dbGetQuery(db, 'SELECT count(ci.movie_id) as total, m.info
 FROM imdb.cast_info ci
 join name n on n.id = ci.person_id
 join title t on t.id = ci.movie_id 
 join role_type r on r.id = ci.role_id
 join movie_info m on m.movie_id = ci.movie_id
-where n.gender like \'f\'
+where n.gender = "m"
 and m.info_type_id =3
-and r.id = 8
-and t.production_year >1999
+and r.id = 3
+and t.production_year > 2010
 group by m.info
-limit 0, 5;')
+order by total desc
+limit 0,5;')
 ```
 
+##Total number of movies produced by men since 2010
+```{r}
+ggplot (data =test, aes(x = info,y = total, fill = info))+
+  geom_bar(stat = "identity")+
+  theme(legend.position = "None")
+```
 
 
 
