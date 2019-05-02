@@ -22,7 +22,7 @@ knitr::opts_chunk$set(connection = db, max.print = 20)
 
 
 ```{r}
-test <- dbGetQuery (db,
+female <- dbGetQuery (db,
                     'select count(ci.movie_id) as total, info as genre, production_year
 from cast_info ci
 join movie_info m on m.movie_id = ci.movie_id ##join to filter by person_role_id
@@ -39,9 +39,55 @@ limit 0,5;')
 ```
 
 ```{r}
-ggplot(test, aes(x = info, y = total, fill = info)) +
+ggplot(female, aes(x = genre, y = total, fill = genre)) +
   geom_bar(stat = "identity") +
   scale_fill_brewer(palette = "Set3")
+```
+
+```{r}
+male <- dbGetQuery (db,
+                    'select count(ci.movie_id) as total, info as genre, production_year
+from cast_info ci
+join movie_info m on m.movie_id = ci.movie_id ##join to filter by person_role_id
+join name n on n.id = ci.person_id ##join to filter by gender
+join role_type r on r.id = ci.role_id
+join title t on t.id = ci.movie_id
+where r.id = 3
+and n.gender = "m"
+and m.info_type_id = 3
+and t.production_year > 2010
+group by m.info
+order by total desc
+limit 0,5;')
+```
+
+```{r}
+ggplot(male, aes(x = genre, y = total, fill = genre)) +
+  geom_bar(stat = "identity") +
+  scale_fill_brewer(palette = "Set3")
+```
+
+```{r}
+new <- dbGetQuery (db,
+                    'select count(ci.movie_id) as total, info as genre, production_year, n.gender
+from cast_info ci
+join movie_info m on m.movie_id = ci.movie_id ##join to filter by person_role_id
+join name n on n.id = ci.person_id ##join to filter by gender
+join role_type r on r.id = ci.role_id
+join title t on t.id = ci.movie_id
+where r.id = 3
+and m.info_type_id = 3
+and t.production_year > 2010
+group by m.info and n.gender
+order by total desc
+limit 0,5;')
+```
+
+```{r}
+ggplot(new, aes(x = genre, y = total, fill = genre)) +
+  geom_bar(stat = "identity") +
+  scale_fill_brewer(palette = "Set3") +
+  facet_wrap()
 ```
 
 
