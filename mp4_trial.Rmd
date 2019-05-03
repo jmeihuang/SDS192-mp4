@@ -95,7 +95,7 @@ ggplot(test, aes(x = production_year, y = total/1000))+
   facet_wrap(~info)+
   theme_bw()+
   scale_color_manual("Gender",labels = c("Female", "Male"), values = fill_c)+
-   theme(axis.text.x = element_text(angle = 90, hjust = 0.4, size = 48), 
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.4, size = 48), 
         axis.title.x = element_text(family = "Century Gothic", 
                                     color = "black", face = "bold", size = 48),
         axis.text.y = element_text(family = "Century Gothic", 
@@ -103,11 +103,11 @@ ggplot(test, aes(x = production_year, y = total/1000))+
         axis.title.y = element_text(family = "Century Gothic", 
                                     color = "black", face = "bold", size = 48),
         plot.title = element_text(family = "Century Gothic", 
-                                    color = "black", face = "bold", size = 52),
+                                    color = "black", face = "bold", size = 68),
         strip.text = element_text(family = "Century Gothic", face = "bold", size = 48),
         legend.text = element_text(family = "Century Gothic", size = 48),
-        legend.title = element_text(family = "Century Gothic", face = "bold", size =48), 
-        legend.position = "bottom", 
+        legend.title = element_text(family = "Century Gothic", face = "bold", size =52),
+        legend.position = "bottom",
         panel.spacing = unit(4, "lines"))+
   labs(title = "Number of Movies Produced by Men/Women in the Top Five Genres", x = "Year", y = "Number of Movies(in 1000s)")
 ```
