@@ -2,7 +2,7 @@
 title: "joyce"
 output:
   html_document:
-    theme: sandstone
+    theme: simplex
     df_print: paged
     code_folding: "hide"
 ---
@@ -41,7 +41,8 @@ limit 0,5;')
 ```{r}
 ggplot(female, aes(x = genre, y = total, fill = genre)) +
   geom_bar(stat = "identity") +
-  scale_fill_brewer(palette = "Set3")
+  scale_fill_brewer(palette = "Set3") +
+  labs(title = "Female")
 ```
 
 ```{r}
@@ -64,12 +65,13 @@ limit 0,5;')
 ```{r}
 ggplot(male, aes(x = genre, y = total, fill = genre)) +
   geom_bar(stat = "identity") +
-  scale_fill_brewer(palette = "Set3")
+  scale_fill_brewer(palette = "Set3") +
+  labs(title = "Male")
 ```
 
 ```{r}
 new <- dbGetQuery (db,
-                    'select count(ci.movie_id) as total, info as genre, production_year, n.gender
+                    'select count(ci.movie_id) as total, info as genre, n.gender
 from cast_info ci
 join movie_info m on m.movie_id = ci.movie_id ##join to filter by person_role_id
 join name n on n.id = ci.person_id ##join to filter by gender
@@ -78,18 +80,13 @@ join title t on t.id = ci.movie_id
 where r.id = 3
 and m.info_type_id = 3
 and t.production_year > 2010
-group by m.info and n.gender
+group by m.info, n.gender
 order by total desc
 limit 0,5;')
 ```
 
 ```{r}
-ggplot(new, aes(x = genre, y = total, fill = genre)) +
-  geom_bar(stat = "identity") +
-  scale_fill_brewer(palette = "Set3") +
-  facet_wrap()
+ggplot(new, aes(fill = genre, y = total, x = n.gender)) + 
+  geom_bar(position="dodge", stat="identity") +
+  facet_wrap(~genre)
 ```
-
-
-
-
