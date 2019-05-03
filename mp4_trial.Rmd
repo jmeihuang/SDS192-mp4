@@ -90,7 +90,7 @@ test <- test %>%
 test
 ```
 
-```{r, warning = FALSE,fig.width = 40, fig.height=30}
+```{r, warning = FALSE,fig.width = 42, fig.height=30}
 fill_c <- c("blue", "red")
 ggplot(test, aes(x = production_year, y = total/1000))+
   geom_line(aes(color = Gender), size = 5)+
