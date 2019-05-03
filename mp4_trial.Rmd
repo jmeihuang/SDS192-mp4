@@ -84,11 +84,12 @@ test <- test %>%
 
 ```
 
-```{r, warning = FALSE,fig.width = 40, fig.height=40}
+```{r, warning = FALSE,fig.width = 40, fig.height=30}
 fill_c <- c("blue", "red")
 ggplot(test, aes(x = production_year, y = total/1000))+
   geom_line(aes(color = gender), size = 5)+
   scale_y_continuous(limits = c(0,40), expand = c(0,0), breaks = c(0,10,20,30,40)) +
+  scale_x_discrete(limits = c(2010, 2011, 2012, 2013, 2014, 2015), expand = c(0,0)) +
   facet_wrap(~info)+
   theme_bw()+
   scale_color_manual("Gender",labels = c("Female", "Male"), values = fill_c)+
