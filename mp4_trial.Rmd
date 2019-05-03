@@ -32,7 +32,7 @@ join title t on t.id = ci.movie_id
 where r.id = 3
 and n.gender = "f"
 and m.info_type_id = 3
-and t.production_year > 2010
+and t.production_year > 2009
 group by m.info
 order by total desc
 limit 0,5;')
@@ -66,7 +66,7 @@ inner join role_type r on r.id = ci.role_id
 inner join movie_info m on m.movie_id = ci.movie_id
 where m.info_type_id =3
 and r.id = 3
-and t.production_year >1999
+and t.production_year >2009
 and t.production_year <2016
 and m.info in (\"Comedy\", \"Drama\", \"Documentary\", \"Short\" , \"Thriller\");')
 ```
