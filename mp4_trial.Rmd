@@ -2,7 +2,7 @@
 title: "mp4_trial"
 output:
   html_document:
-    theme: sandstone
+    theme: simplex
     df_print: paged
     code_folding: "hide"
 ---
@@ -12,6 +12,7 @@ output:
 library(tidyverse)
 library(RMySQL)
 library(dplyr)
+library(ggthemes)
 db <- dbConnect(MySQL(), 
                 host = "scidb.smith.edu", 
                 user = "mth292", 
@@ -20,9 +21,9 @@ db <- dbConnect(MySQL(),
 knitr::opts_chunk$set(connection = db, max.print = 20)
 ```
 
-##Top male dominated genres
+##Top 5 genres
 ```{r}
-test <- dbGetQuery(db, 'SELECT m.info, t.production_year, ci.movie_id
+test <- dbGetQuery(db, 'SELECT m.info, t.production_year, ci.movie_id, n.gender
 FROM imdb.cast_info ci
 inner join name n on n.id = ci.person_id
 inner join title t on t.id = ci.movie_id 
@@ -37,16 +38,24 @@ and m.info in (\"Comedy\", \"Drama\", \"Documentary\", \"Short\" , \"Thriller\")
 
 ```{r}
 test <- test %>%
-  group_by(production_year, info)%>%
+  filter(gender != "NA")
+
+test <- test %>%
+  group_by(production_year, info, gender)%>%
   summarise(total =n())
+
+
 
 ```
 
 ```{r}
+fill_c <- c("blue", "red")
 summarise(total = n())
 ggplot(test, aes(x = production_year, y = total))+
-  geom_line(color = "red")+
-  facet_wrap(~info)
+  geom_line(aes(color = gender))+
+  facet_wrap(~info)+
+  theme_bw()+
+  scale_color_manual("Gender",labels = c("Female", "Male"), values = fill_c)
 ```
 
 
