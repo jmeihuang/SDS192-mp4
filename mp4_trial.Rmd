@@ -42,7 +42,7 @@ limit 0,5;')
 ggplot(female, aes(x = genre, y = total/1000, fill = genre)) +
   geom_bar(stat = "identity") +
   scale_fill_brewer(palette = "Set2")+
-  scale_fll_manual("Genre")+
+  scale_fill_manual("Genre")+
   theme(axis.text.x = element_text(size = 12),
         axis.title.x = element_text(family = "Century Gothic", 
                                     color = "black", face = "bold", size = 13),
