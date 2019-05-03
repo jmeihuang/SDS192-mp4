@@ -58,6 +58,22 @@ ggplot(female, aes(x = genre, y = total/1000, fill = genre)) +
 ```
 
 ##Top 5 genres
+
+```{sql connection=db}
+SELECT m.info, t.production_year, ci.movie_id, n.gender
+FROM imdb.cast_info ci
+inner join name n on n.id = ci.person_id
+inner join title t on t.id = ci.movie_id 
+inner join role_type r on r.id = ci.role_id
+inner join movie_info m on m.movie_id = ci.movie_id
+where m.info_type_id =3
+and r.id = 3
+and t.production_year >2009
+and t.production_year <2016
+and m.info in ("Comedy", "Drama", "Documentary", "Short" , "Thriller")
+```
+
+
 ```{r}
 test <- dbGetQuery(db, 'SELECT m.info, t.production_year, ci.movie_id, n.gender
 FROM imdb.cast_info ci
@@ -87,7 +103,7 @@ ggplot(test, aes(x = production_year, y = total/1000))+
   geom_line(aes(color = gender), size = 5)+
   scale_y_continuous(limits = c(0,40), expand = c(0,0), breaks = c(0,10,20,30,40)) +
   scale_x_discrete(limits = c(2010, 2011, 2012, 2013, 2014, 2015), expand = c(0,0)) +
-  facet_wrap(~info)+
+  facet_wrap(~info, ncol = 5)+
   theme_bw()+
   scale_color_manual("Gender",labels = c("Female", "Male"), values = fill_c)+
    theme(axis.text.x = element_text(angle = 90, hjust = 0.4, size = 48), 
@@ -98,10 +114,12 @@ ggplot(test, aes(x = production_year, y = total/1000))+
         axis.title.y = element_text(family = "Century Gothic", 
                                     color = "black", face = "bold", size = 48),
         plot.title = element_text(family = "Century Gothic", 
-                                    color = "black", face = "bold", size = 52),
+                                    color = "black", face = "bold", size = 68),
         strip.text = element_text(family = "Century Gothic", face = "bold", size = 48),
         legend.text = element_text(family = "Century Gothic", size = 48),
-        legend.title = element_text(family = "Century Gothic", face = "bold", size =48))+
+        legend.title = element_text(family = "Century Gothic", face = "bold", size =52),
+        legend.position = "bottom",
+        panel.spacing = unit(4, "lines"))+
   labs(title = "Number of Movies Produced by Men/Women in the Top Five Genres", x = "Year", y = "Number of Movies(in 1000s)")
 ```
 
