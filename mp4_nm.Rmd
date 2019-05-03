@@ -1,5 +1,5 @@
 ---
-title: "mp4_trial"
+title: "mp4_nm"
 output: 
   html_document:
     code folding: "hide"
@@ -9,6 +9,8 @@ output:
 ##loading the packages and pulling out the imdb dataset
 library(tidyverse)
 library(RMySQL)
+library(ggplot2)
+library(RColorBrewer)
 db <- dbConnect(MySQL(), 
                 host = "scidb.smith.edu", 
                 user = "mth292", 
@@ -17,32 +19,47 @@ db <- dbConnect(MySQL(),
 knitr::opts_chunk$set(connection = db, max.print = 20)
 ```
 
+
 ```{r}
-##filtering the movie_id that Weinstein produced ----
-movie_id <- dbGetQuery(db, 'SELECT ci.movie_id, t.production_year
-FROM imdb.cast_info ci
-join name n on n.id = ci.person_id
-join title t on t.id = ci.movie_id
+female_producers <- dbGetQuery (db,
+                    'select count(ci.movie_id) as total, info as genre, production_year
+from cast_info ci
+join movie_info m on m.movie_id = ci.movie_id ##join to filter by person_role_id
+join name n on n.id = ci.person_id ##join to filter by gender
 join role_type r on r.id = ci.role_id
-where n.id = 2551650
-and r.id = 3
-order by production_year desc;')
+join title t on t.id = ci.movie_id
+where r.id = 3
+and n.gender = "f"
+and m.info_type_id = 3
+and t.production_year > 2010
+group by m.info
+order by total desc
+limit 0,5;')
+```
+
+
+```{sql connection=db}
+select count(ci.movie_id) as total, info as genre, production_year
+from cast_info ci
+join movie_info m on m.movie_id = ci.movie_id ##join to filter by person_role_id
+join name n on n.id = ci.person_id ##join to filter by gender
+join role_type r on r.id = ci.role_id
+join title t on t.id = ci.movie_id
+where r.id = 3
+and n.gender = "f"
+and m.info_type_id = 3
+and t.production_year > 2010
+group by m.info
+order by total desc
+limit 0,5;
 ```
 
 
 ```{r}
-#Movies with women producers, with movie names, genres, and production years
-
-female_producers <- dbGetQuery(db, 'SELECT ci.id, ci.movie_id, t.title,  mi.info, t.production_year, n.name, n.gender, r.id
-FROM imdb.cast_info ci
-join name n on n.id = ci.person_id
-join title t on t.id = ci.movie_id
-join movie_info mi on mi.movie_id = ci.movie_id
-join role_type r on r.id = ci.role_id
-where n.gender like \'f\'
-AND r.id = 8
-AND t.production_year >= 2010
-AND mi.info_type_id = 3
-LIMIT 0,10000;')
+ggplot(female_producers, aes(x = genre, y = total, fill = genre)) +
+  geom_bar(stat = "identity") +
+  scale_fill_brewer(palette = "Set3")
 ```
+
+
 
