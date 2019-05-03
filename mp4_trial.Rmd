@@ -41,7 +41,8 @@ limit 0,5;')
 ```{r}
 ggplot(female, aes(x = genre, y = total, fill = genre)) +
   geom_bar(stat = "identity") +
-  scale_fill_brewer(palette = "Set3")
+  scale_fill_brewer(palette = "Set2")+
+  scale_color_manual("Gender")
 ```
 
 ##Top 5 genres
@@ -71,13 +72,27 @@ test <- test %>%
 
 ```
 
-```{r}
+```{r, warning = FALSE}
 fill_c <- c("blue", "red")
-ggplot(test, aes(x = production_year, y = total))+
+ggplot(test, aes(x = production_year, y = total/1000))+
   geom_line(aes(color = gender))+
+  scale_y_continuous(expand = c(0,0)) +
   facet_wrap(~info)+
   theme_bw()+
-  scale_color_manual("Gender",labels = c("Female", "Male"), values = fill_c)
+  scale_color_manual("Gender",labels = c("Female", "Male"), values = fill_c)+
+   theme(axis.text.x = element_text(angle = 20, hjust = 0.4, size = 18), 
+        axis.title.x = element_text(family = "Century Gothic", 
+                                    color = "black", face = "bold", size = 24),
+        axis.text.y = element_text(family = "Century Gothic", 
+                                    color = "black", face = "bold", size = 20), 
+        axis.title.y = element_text(family = "Century Gothic", 
+                                    color = "black", face = "bold", size = 24),
+        plot.title = element_text(family = "Century Gothic", 
+                                    color = "black", face = "bold", size = 30),
+        strip.text = element_text(family = "Century Gothic", face = "bold", size = 26),
+        legend.text = element_text(family = "Century Gothic", face = "bold", size = 24),
+        legend.title = element_text(family = "Century Gothic", face = "bold", size = 26))+
+  labs(title = "Movie Production by Women in Top Five Movies", x = "Year", y = "Number of Movies(in 1000s)")
 ```
 
 
