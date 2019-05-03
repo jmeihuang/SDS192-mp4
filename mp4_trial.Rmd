@@ -23,7 +23,7 @@ knitr::opts_chunk$set(connection = db, max.print = 20)
 
 ```{r}
 female <- dbGetQuery (db,
-                    'select count(ci.movie_id) as total, info as genre, production_year
+                    'select count(ci.movie_id) as total, info as genre
 from cast_info ci
 join movie_info m on m.movie_id = ci.movie_id ##join to filter by person_role_id
 join name n on n.id = ci.person_id ##join to filter by gender
