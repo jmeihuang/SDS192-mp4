@@ -42,7 +42,17 @@ limit 0,5;')
 ggplot(female, aes(x = genre, y = total, fill = genre)) +
   geom_bar(stat = "identity") +
   scale_fill_brewer(palette = "Set2")+
-  scale_color_manual("Gender")
+  scale_color_manual("Gender")+
+  theme(axis.title.x = element_text(family = "Century Gothic", 
+                                    color = "black", face = "bold", size = 16),
+        axis.text.y = element_text(family = "Century Gothic", 
+                                    color = "black", face = "bold", size = 12), 
+        axis.title.y = element_text(family = "Century Gothic", 
+                                    color = "black", face = "bold", size = 16),
+        plot.title = element_text(family = "Century Gothic", 
+                                    color = "black", face = "bold", size = 20),
+        legend.text = element_text(family = "Century Gothic", face = "bold", size = 18),
+        legend.title = element_text(family = "Century Gothic", face = "bold", size = 14))
 ```
 
 ##Top 5 genres
