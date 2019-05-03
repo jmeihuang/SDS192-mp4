@@ -78,8 +78,10 @@ join name n on n.id = ci.person_id ##join to filter by gender
 join role_type r on r.id = ci.role_id
 join title t on t.id = ci.movie_id
 where r.id = 3
-and m.info_type_id = 3
-and t.production_year > 2010
+and (n.gender is not NULL)
+and m.info_type_id =3
+and t.production_year >2009
+and t.production_year <2016
 group by m.info, n.gender
 order by total desc
 limit 0,5;')
