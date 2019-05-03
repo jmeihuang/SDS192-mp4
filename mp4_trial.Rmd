@@ -107,7 +107,8 @@ ggplot(test, aes(x = production_year, y = total/1000))+
         strip.text = element_text(family = "Century Gothic", face = "bold", size = 48),
         legend.text = element_text(family = "Century Gothic", size = 48),
         legend.title = element_text(family = "Century Gothic", face = "bold", size =48), 
-        legend.position = "bottom")+
+        legend.position = "bottom", 
+        panel.spacing = unit(4, "lines"))+
   labs(title = "Number of Movies Produced by Men/Women in the Top Five Genres", x = "Year", y = "Number of Movies(in 1000s)")
 ```
 
