@@ -66,6 +66,7 @@ inner join title t on t.id = ci.movie_id
 inner join role_type r on r.id = ci.role_id
 inner join movie_info m on m.movie_id = ci.movie_id
 where m.info_type_id =3
+and (n.gender is not NULL)
 and r.id = 3
 and t.production_year >2009
 and t.production_year <2016
@@ -73,15 +74,11 @@ and m.info in (\"Comedy\", \"Drama\", \"Documentary\", \"Short\" , \"Thriller\")
 ```
 
 ```{r}
-test <- test %>%
-  filter(gender != "NA")
 
 test <- test %>%
   group_by(production_year, info, gender)%>%
   summarise(total =n())
-
-#added a comment
-
+test
 ```
 
 ```{r, warning = FALSE,fig.width = 40, fig.height=30}
