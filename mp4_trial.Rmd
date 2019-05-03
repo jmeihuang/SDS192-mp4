@@ -11,6 +11,7 @@ output:
 ##loading the packages and pulling out the imdb dataset
 library(tidyverse)
 library(RMySQL)
+library(dplyr)
 db <- dbConnect(MySQL(), 
                 host = "scidb.smith.edu", 
                 user = "mth292", 
@@ -19,49 +20,39 @@ db <- dbConnect(MySQL(),
 knitr::opts_chunk$set(connection = db, max.print = 20)
 ```
 
+##Top male dominated genres
 ```{r}
-##filtering the movie_id that Weinstein produced ----
-movie_id <- dbGetQuery(db, 'SELECT ci.movie_id, t.production_year
+test <- dbGetQuery(db, 'SELECT m.info, t.production_year, ci.movie_id
 FROM imdb.cast_info ci
-join name n on n.id = ci.person_id
-join title t on t.id = ci.movie_id
-join role_type r on r.id = ci.role_id
-where n.id = 2551650
+inner join name n on n.id = ci.person_id
+inner join title t on t.id = ci.movie_id 
+inner join role_type r on r.id = ci.role_id
+inner join movie_info m on m.movie_id = ci.movie_id
+where m.info_type_id =3
 and r.id = 3
-order by production_year desc;')
-```
-
-```{r}
-new <- dbGetQuery(db, 'SELECT count(ci.movie_id), m.info
-FROM imdb.cast_info ci
-join name n on n.id = ci.person_id
-join title t on t.id = ci.movie_id 
-join role_type r on r.id = ci.role_id
-join movie_info m on m.movie_id = ci.movie_id
-where n.gender like \'f\'
-and m.info_type_id =3
-and r.id = 8
 and t.production_year >1999
-group by m.info
-limit 0, 5;')
+and t.production_year <2019
+and m.info in (\"Comedy\", \"Drama\", \"Documentary\", \"Short\" , \"Thriller\");')
 ```
-
-
-
 
 ```{r}
-#Trying to get the women producers 
+test <- test %>%
+  group_by(production_year, info)%>%
+  summarise(total =n())
 
-female_producers <- dbGetQuery(db, 'SELECT ci.id, ci.movie_id, t.title,  mi.info, t.production_year, n.name, n.gender, r.id
-FROM imdb.cast_info ci
-join name n on n.id = ci.person_id
-join title t on t.id = ci.movie_id
-join movie_info mi on mi.movie_id = ci.movie_id
-join role_type r on r.id = ci.role_id
-where n.gender like \'f\'
-AND r.id = 8
-AND mi.info_type_id = 3;')
 ```
+
+```{r}
+summarise(total = n())
+ggplot(test, aes(x = production_year, y = total))+
+  geom_line(color = "red")+
+  facet_wrap(~info)
+```
+
+
+
+
+
 
 
 
