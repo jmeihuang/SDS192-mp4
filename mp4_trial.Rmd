@@ -99,7 +99,11 @@ ggplot(test, aes(x = production_year, y = total/1000))+
   facet_wrap(~info, ncol = 5)+
   theme_bw()+
   scale_color_manual("Gender",labels = c("Female", "Male"), values = fill_c)+
+<<<<<<< HEAD
     theme(axis.text.x = element_text(angle = 90, hjust = 0.4, size = 48), 
+=======
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.4, size = 48), 
+>>>>>>> 4b51fe5ae6aa66bece3a3891a69bf6de908a1781
         axis.title.x = element_text(family = "Century Gothic", 
                                     color = "black", face = "bold", size = 48),
         axis.text.y = element_text(family = "Century Gothic", 
