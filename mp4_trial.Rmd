@@ -41,7 +41,7 @@ limit 0,5;')
 ```{r, warning= FALSE}
 ggplot(female, aes(x = genre, y = total/1000, fill = genre)) +
   geom_bar(stat = "identity") +
-  scale_y_continuous(expand = c(0,0)) +
+  scale_y_continuous(limits = c(0,80),expand = c(0,0), breaks = c(0,20,40,60,80)) +
   scale_fill_brewer("Genre",palette = "Set2")+
   theme(axis.text.x = element_text(size = 12),
         axis.title.x = element_text(family = "Century Gothic", 
@@ -84,11 +84,11 @@ test <- test %>%
 
 ```
 
-```{r, warning = FALSE}
+```{r, warning = FALSE,fig.width = 40}
 fill_c <- c("blue", "red")
 ggplot(test, aes(x = production_year, y = total/1000))+
   geom_line(aes(color = gender))+
-  scale_y_continuous(expand = c(0,0)) +
+  scale_y_continuous(limits = c(0,40), expand = c(0,0), breaks = c(0,10,20,30,40)) +
   facet_wrap(~info)+
   theme_bw()+
   scale_color_manual("Gender",labels = c("Female", "Male"), values = fill_c)+
