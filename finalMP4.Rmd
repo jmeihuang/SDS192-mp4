@@ -1,0 +1,190 @@
+---
+title: "The Top 5 Genres For Female Producers Are Dominated By Males"
+author: "Chhiring Lama, Nukhbah Majid, Joyce Huang"
+output:
+  html_document:
+    theme: sandstone
+    toc: true
+    toc_float: true
+    df_print: paged
+    code_folding: "hide"
+---
+
+Date: `r format(Sys.Date(), "%B %e, %Y")`
+Time: `r format(Sys.time(), "%X")`
+`r format(Sys.Date(), "%B %e, %Y")`
+at `r format(Sys.time(), "%X")`
+
+Filed under: ##Producers ##Women ##imdb
+
+<CENTER>
+![](image1.png){width=100%}
+</CENTER>
+
+##Introduction:
+
+Following the #MeToo and Time's Up movement, there is increasing leadership participation from women in various industries. Movies like [Wonder Woman, Girls Trip, and the recent Star Wars films have either women leads or a cast made up of mainly women](https://www.refinery29.com/en-us/2018/07/198414/2019-movies-coming-out-female-directors). While we can see that these successful productions are faced with women, how many of them are actually produced by women who get to lead behind the scenes? [^1] Men tend to dominate higher level roles, but we can expect great works from women producers as well. An example of a highly-anticipated upcoming movie is Star Wars: The Rise of Skywalker co-produced by [Kathleen Kennedy](https://en.wikipedia.org/wiki/Kathleen_Kennedy_(producer)).
+
+Using the IMDB dataset, we want to see what are the top five genres for women producers. Among those genres, we want to see how many media productions are led by women compared to those produced by men over a period of time. **Do men actually produce films and shows more than women?**
+
+<CENTER>
+![](image2.png){width=100%}
+*Some productions by women in some of the most popular genres. (Left to right: Thriller, Documentary, Comedy)*
+</CENTER>
+
+
+
+**Note**: For our analysis, when we mention "movies" we are not only including films, but other media productions as well.
+
+##Hypothesis
+We propose that in the most popular movie genres women produce, even if the number of women-produced movies increased, the rate of increase will not be as high as men from the years 2010 to 2018.
+
+
+##Using the Data 
+Movie genres that are produced the most by women are in the following descending order: Short, Drama, Comedy, Documentary, and Thriller. We were able to achieve this by using several data tables in the IMDB dataset. The table `cast_info` contains a column that is shared with other tables which are called a primary key. By using this key, we can access information from other tables. Those tables used are `movie_info` which has information on genres, `name` which contains real names of people, `role_type` which gives us information on different roles such as director, actor, producer, etc., and title provides the movie title and the production year. With this information, we can pull and filter for certain details: we are looking for female producers and how many movies they produced in **each genre from 2010 onwards**. The best way to visualize this would be a bar graph.
+
+
+```{r, echo = FALSE, message=FALSE, warning=FALSE}
+##loading the packages and pulling out the imdb dataset
+library(tidyverse)
+library(RMySQL)
+library(dplyr)
+library(ggthemes)
+db <- dbConnect(MySQL(), 
+                host = "scidb.smith.edu", 
+                user = "mth292", 
+                password = "RememberPi", 
+                dbname = "imdb")
+knitr::opts_chunk$set(connection = db, max.print = 20)
+```
+
+```{r}
+female <- dbGetQuery (db,
+                    'select count(ci.movie_id) as total, info as genre
+from cast_info ci
+join movie_info m on m.movie_id = ci.movie_id ##join to filter by person_role_id
+join name n on n.id = ci.person_id ##join to filter by gender
+join role_type r on r.id = ci.role_id
+join title t on t.id = ci.movie_id
+where r.id = 3
+and n.gender = "f"
+and m.info_type_id = 3
+and t.production_year > 2009
+group by m.info
+order by total desc
+limit 0,5;')
+```
+
+<CENTER>
+
+```{r, warning= FALSE}
+ggplot(female, aes(x = genre, y = total/1000, fill = genre)) +
+  geom_bar(stat = "identity") +
+  scale_y_continuous(limits = c(0,80),expand = c(0,0), breaks = c(0,20,40,60,80)) +
+  scale_fill_brewer("Genre",palette = "Set2")+
+  theme(axis.text.x = element_text(size = 12),
+        axis.title.x = element_text(family = "Century Gothic", 
+                                    color = "black", face = "bold", size = 13),
+        axis.text.y = element_text(family = "Century Gothic", 
+                                    color = "black", size = 12), 
+        axis.title.y = element_text(family = "Century Gothic", 
+                                    color = "black", face = "bold", size = 13),
+        plot.title = element_text(family = "Century Gothic", 
+                                    color = "black", face = "bold", size = 20),
+        legend.text = element_text(family = "Century Gothic",size = 12),
+        legend.title = element_text(family = "Century Gothic", face = "bold", size = 14))+
+   labs(title = "Top Five Genres Among Women Producers", x = "Genre", y = "Number of Media Productions(in 1000s)")
+```
+
+</CENTER>
+
+The top genre produced by women is **Short**. This is an interesting discovery because short films aren't popularized in the media as much as longer films. However, short films would take less time and money to produce than non-short films so it is likely that less-known aspiring producers will produce short-films more.
+
+##The Top 5 Genres
+```{r}
+#"m.info_type_id = 3" this is where we use indexes (1)
+#"ci.role_id = 3" #this is where we use indexes (2)
+test <- dbGetQuery(db, 'SELECT m.info as Genre, t.production_year as Production_Year, ci.movie_id, n.gender
+FROM imdb.cast_info ci
+inner join name n on n.id = ci.person_id
+inner join title t on t.id = ci.movie_id 
+inner join movie_info m on m.movie_id = ci.movie_id
+where m.info_type_id =3 
+and (n.gender is not NULL)
+and ci.role_id = 3
+and t.production_year >2009
+and t.production_year <2019
+and m.info in (\"Comedy\", \"Drama\", \"Documentary\", \"Short\" , \"Thriller\");')
+```
+
+```{r}
+test <- test %>%
+  group_by(Production_Year, Genre, gender)%>%
+  summarise(Total =n())
+test <- test %>%
+  mutate(Gender =  recode_factor(gender, 
+                                 "f" = "Female",
+                                 "m" = "Male"))%>%
+  select(Genre, Gender, Production_Year, Total)
+test
+```
+
+The table gives us a glimpse of our dataset that contained the number of movies produced by male and female producers in each of the five genres between 2010 and 2018. 
+
+**So for each of these genres, do women produce more movies than men in this field?**
+
+By grouping the movies by genre and filtering for total movies produced by both male and female producers over the years 2010 to 2018, we plotted the data to analyze the data genre-wise as shown below: 
+
+```{r, warning = FALSE,fig.width = 42, fig.height=30}
+fill_c <- c("blue", "red")
+ggplot(test, aes(x = Production_Year, y = Total/1000))+
+  geom_line(aes(color = Gender), size = 5)+
+  scale_y_continuous(limits = c(0,40), expand = c(0,0), breaks = c(0,10,20,30,40)) +
+  scale_x_discrete(limits = c(2010, 2011, 2012, 2013,
+                              2014, 2015, 2016, 2017, 2018), expand = c(0,0)) +
+  facet_wrap(~Genre, ncol = 5)+
+  theme_bw()+
+  scale_color_manual("Gender",labels = c("Female", "Male"), values = fill_c)+
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.4, size = 48), 
+        axis.title.x = element_text(family = "Century Gothic", 
+                                    color = "black", face = "bold", size = 48),
+        axis.text.y = element_text(family = "Century Gothic", 
+                                    color = "black", size = 48), 
+        axis.title.y = element_text(family = "Century Gothic", 
+                                    color = "black", face = "bold", size = 48),
+        plot.title = element_text(family = "Century Gothic", 
+                                    color = "black", face = "bold", size = 68),
+        strip.text = element_text(family = "Century Gothic", face = "bold", size = 48),
+        legend.text = element_text(family = "Century Gothic", size = 48),
+        legend.title = element_text(family = "Century Gothic", face = "bold", size =52),
+        legend.position = "bottom",
+        panel.spacing = unit(4, "lines"))+
+  labs(title = "Number of Productions by Men & Women in the Top Five Genres", x = "Year", y = "Number of Productions(in 1000s)")
+```
+
+
+##Analysis
+
+As our hypothesis had initially spectated, the **rate of increase** in the number of producers for both genders generally went up (i.e. the lines hiked for both the genders as the years progressed), however, the rate of increase in the number of male producers was **higher** than the rate of increase in the number of female producers (i.e the trend line for the number of male producers rose **steeply** as compared to the trend line for the number of female producers).
+
+##Counterargument
+
+However, for years **2017-18**, our hypothesis **cannot be fully asserted** that the rate of increase in the number of male producers was higher than that of the number of female producers. This is because there is a sudden drop in the number of production tallied for both the genders (this can be seen as the sudden drop by the end of the genre-wise plots). 
+
+One of the counter-arguments one could give looking at the line graph is that women are producing more movies and that there has been a huge improvement. Another alternative conclusion that we could make is that the gender gap has started decreasing after 2016. Again, the graph shows a drastic overall decrease in movie production, which we believe might be because the database does not contain information about all the recent production after 2016. If we had the complete set of information, we expect to see a surge in women-led productions in all five genres after the start of **#MeToo** movement in 2017 and **#TimesUp** movement in 2018 - we hope that the disparity shrinks in the future. 
+
+##Conclusion
+
+The trend that we observed between 2010 and 2018 is that in the genres that women tend to produce the most, more movies are produced by men than women.
+
+What can we expect from the future? Hopefully, the #MeToo movement has inspired more women to step up from the shadows and take on roles traditionally held by men. 
+
+##About the Authors
+Chhiring, Nukhbah, and Joyce are three lovely Smith College students who are taking an Introduction to Data Science course. Check out our GitHub repo![^2]
+
+
+[^1]: [Statistics for Women Roles in the Media:](https://womenandhollywood.com/resources/statistics/tv-statistics/) 
+[^2]: [Our GitHub repo:](https://github.com/nukhbahmajid/SDS192-mp4) 
+
+
+> Word count: `r wordcountaddin::word_count()`
