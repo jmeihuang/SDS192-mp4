@@ -45,7 +45,7 @@ Movie genres that are produced the most by women are in the following descending
 
 
 ```{r, echo = FALSE, message=FALSE, warning=FALSE}
-##loading the packages and pulling out the imdb dataset
+##loading the packages and pulling out the imdb dataset----
 library(tidyverse)
 library(RMySQL)
 library(dplyr)
@@ -59,6 +59,7 @@ knitr::opts_chunk$set(connection = db, max.print = 20)
 ```
 
 ```{r}
+##finding the top five genres for female producers ----
 female <- dbGetQuery (db,
                     'select count(ci.movie_id) as total, info as genre
 from cast_info ci
@@ -78,6 +79,7 @@ limit 0,5;')
 <CENTER>
 
 ```{r, warning= FALSE}
+##plotting a bar graph for the top five genres ----
 ggplot(female, aes(x = genre, y = total/1000, fill = genre)) +
   geom_bar(stat = "identity") +
   scale_y_continuous(limits = c(0,80),expand = c(0,0), breaks = c(0,20,40,60,80)) +
@@ -102,6 +104,7 @@ The top genre produced by women is **Short**. This is an interesting discovery b
 
 ##The Top 5 Genres
 ```{r}
+##making a table with the list of all the movie produced from 2010 to 2018 that fall in one of the 5 categories: Comedy, Drama, Documentary, Short, Thriller ----
 #"m.info_type_id = 3" this is where we use indexes (1)
 #"ci.role_id = 3" #this is where we use indexes (2)
 test <- dbGetQuery(db, 'SELECT m.info as Genre, t.production_year as Production_Year, ci.movie_id, n.gender
@@ -118,6 +121,7 @@ and m.info in (\"Comedy\", \"Drama\", \"Documentary\", \"Short\" , \"Thriller\")
 ```
 
 ```{r}
+##editing the test table to summarise the number of production by males and females in each of the five genres between 2010 to 2018 ----
 test <- test %>%
   group_by(Production_Year, Genre, gender)%>%
   summarise(Total =n())
@@ -136,6 +140,7 @@ The table gives us a glimpse of our dataset that contained the number of movies 
 By grouping the movies by genre and filtering for total movies produced by both male and female producers over the years 2010 to 2018, we plotted the data to analyze the data genre-wise as shown below: 
 
 ```{r, warning = FALSE,fig.width = 42, fig.height=30}
+##Plotting a line graph for each genre to show the media production by females and males from 2010 to 2018 ----
 fill_c <- c("blue", "red")
 ggplot(test, aes(x = Production_Year, y = Total/1000))+
   geom_line(aes(color = Gender), size = 5)+
